@@ -20,8 +20,6 @@ use Throwable;
 )]
 class ParseProductsCommand extends Command
 {
-    private const BATCH_SIZE = 20;
-
     public function __construct(
         private readonly ProductParserService $parserService,
         private readonly EntityManagerInterface $entityManager,
@@ -77,18 +75,15 @@ class ParseProductsCommand extends Command
 
     private function saveProductsToDatabase(array $products): void
     {
-        foreach ($products as $index => $productDTO) {
-            $product = (new Product())
-                ->setName($productDTO->getName())
-                ->setPrice($productDTO->getPrice())
+        foreach ($products as $productDTO) {
+            $product = $this->entityManager
+                ->getRepository(Product::class)
+                ->findOrCreateProduct($productDTO->getName());
+            $product->setPrice($productDTO->getPrice())
                 ->setImageUrl($productDTO->getImageUrl())
                 ->setProductUrl($productDTO->getProductUrl());
-
-            $this->entityManager->persist($product);
-
-            if (($index + 1) % self::BATCH_SIZE === 0) {
-                $this->entityManager->flush();
-                $this->entityManager->clear();
+            if ($product->getId() === null){
+                $this->entityManager->persist($product);
             }
         }
         $this->entityManager->flush();
