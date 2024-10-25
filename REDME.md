@@ -10,7 +10,7 @@ A Symfony-based application for parsing product information from e-commerce webs
 ## Requirements
 
 - PHP 8.2 or higher
-- Symfony 6.4 or higher
+- Symfony 7.1 or higher
 - Composer
 - MySQL/MariaDB
 
