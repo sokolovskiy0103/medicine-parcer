@@ -22,15 +22,16 @@ git clone git@github.com:sokolovskiy0103/medicine-parcer.git
 cd medicine-parcer
 ```
 
-2. Install dependencies:
+2. Configure your database in `.env`:
+```env
+DATABASE_URL="mysql://user:password@127.0.0.1:3306/product_parser"
+```
+
+3. Install dependencies:
 ```bash
 composer install
 ```
 
-3. Configure your database in `.env`:
-```env
-DATABASE_URL="mysql://user:password@127.0.0.1:3306/product_parser"
-```
 
 ## Usage
 
