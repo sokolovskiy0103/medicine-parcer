@@ -35,7 +35,7 @@ class ParseProductsCommand extends Command
             ->addArgument('path', InputArgument::OPTIONAL, 'Path to save CSV file (temporary file by default)');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $url = $input->getArgument('url');
