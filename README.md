@@ -47,9 +47,10 @@ Arguments:
 - `url`: (Required) URL to parse products from
 - `csv-path`: (Optional) Path where to save the CSV file. If not specified, a temporary file will be created
 
-Example:
+Examples:
 ```bash
-php bin/console app:parse-products https://tabletki.ua/uk/category/123 ./products.csv
+php bin/console app:parse-products https://tabletki.ua/uk/category/242/ ./products.csv
+php bin/console app:parse-products https://tabletki.ua/uk/category/2060/filter/page=2/
 ```
 
 ### Supported URLs

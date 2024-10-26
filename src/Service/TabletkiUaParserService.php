@@ -38,11 +38,9 @@ readonly class TabletkiUaParserService implements ProductParserInterface
         return $products;
     }
 
-    private function normalizePrice(string $priceText): float
+    private function normalizePrice(string $priceText): string
     {
-        $normalizedPrice = preg_replace('/[^\d.]/', '', $priceText);
-
-        return (float)$normalizedPrice;
+        return preg_replace('/[^\d.]/', '', $priceText);
     }
 
     private function normalizeUrl(string $url): string

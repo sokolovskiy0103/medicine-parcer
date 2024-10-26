@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Product;
+use App\Exception\ValidationException;
 use App\Service\ProductParserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -67,6 +68,13 @@ class ParseProductsCommand extends Command
 
             $io->success('Parsing finished successfully!');
             return Command::SUCCESS;
+        } catch (ValidationException $e) {
+            $io->error('Validation failed:');
+            foreach ($e->getErrors() as $path => $messages) {
+                foreach ($messages as $message) {
+                    $io->writeln(sprintf('  - %s: %s', $path, $message));
+                }
+            }
         } catch (Throwable $e) {
             $io->error('An error occurred: ' . $e->getMessage());
             return Command::FAILURE;

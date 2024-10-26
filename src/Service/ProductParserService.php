@@ -4,7 +4,9 @@ namespace App\Service;
 
 use App\DTO\ProductDTO;
 use App\Exception\ParserNotSupportedException;
+use App\Exception\ValidationException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -19,6 +21,7 @@ readonly class ProductParserService
         #[AutowireIterator('app.productParser')]
         private iterable $parsers,
         private HttpClientInterface $client,
+        private ValidatorInterface $validator,
     ) {}
 
     /**
@@ -34,7 +37,12 @@ readonly class ProductParserService
         foreach ($this->parsers as $parser) {
             if ($parser->supports($url)) {
                 $request = $this->client->request('GET', $url);
-                return $parser->parse($request->getContent());
+                $products =  $parser->parse($request->getContent());
+                $violations = $this->validator->validate($products);
+                if (count($violations) > 0) {
+                    throw new ValidationException($violations);
+                }
+                return $products;
             }
         }
 
