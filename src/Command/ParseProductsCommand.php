@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Exception\ValidationException;
 use App\Service\ProductParserService;
 use Doctrine\ORM\EntityManagerInterface;
+use http\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -56,8 +57,7 @@ class ParseProductsCommand extends Command
             $csvData = $this->serializer->serialize($products, 'csv');
 
             if (!is_writable(dirname($path))) {
-                $io->error("Path '$path' is not writable.");
-                return Command::FAILURE;
+                throw new InvalidArgumentException("Path '$path' is not writable.");
             }
 
             file_put_contents($path, $csvData);
@@ -69,12 +69,7 @@ class ParseProductsCommand extends Command
             $io->success('Parsing finished successfully!');
             return Command::SUCCESS;
         } catch (ValidationException $e) {
-            $io->error('Validation failed:');
-            foreach ($e->getErrors() as $path => $messages) {
-                foreach ($messages as $message) {
-                    $io->writeln(sprintf('  - %s: %s', $path, $message));
-                }
-            }
+            return $this->displayValidationErrors($io, $e);
         } catch (Throwable $e) {
             $io->error('An error occurred: ' . $e->getMessage());
             return Command::FAILURE;
@@ -96,5 +91,18 @@ class ParseProductsCommand extends Command
         }
         $this->entityManager->flush();
         $this->entityManager->clear();
+    }
+
+
+    private function displayValidationErrors(SymfonyStyle $io, \Exception|ValidationException $e): int
+    {
+        $io->error('Validation failed:');
+        foreach ($e->getErrors() as $path => $messages) {
+            foreach ($messages as $message) {
+                $io->writeln(sprintf('  - %s: %s', $path, $message));
+            }
+        }
+
+        return Command::FAILURE;
     }
 }
